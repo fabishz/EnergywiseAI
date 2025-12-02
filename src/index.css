@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+
+    /* Vibrant eco-green palette */
+    --primary: 122 39% 49%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 122 39% 85%;
+    --primary-dark: 122 39% 25%;
+
+    --secondary: 122 25% 95%;
+    --secondary-foreground: 122 39% 25%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 122 50% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 122 39% 49%;
+
+    --radius: 0.75rem;
+
+    /* Eco theme gradients and effects */
+    --gradient-primary: linear-gradient(135deg, hsl(122, 39%, 49%), hsl(122, 50%, 60%));
+    --gradient-hero: linear-gradient(180deg, hsl(122, 39%, 97%), hsl(0, 0%, 100%));
+    --shadow-eco: 0 10px 30px -10px hsl(122, 39%, 49% / 0.2);
+    --shadow-card: 0 4px 20px -4px hsl(0, 0%, 0% / 0.1);
+  }
+
+  .dark {
+    --background: 0 0% 8%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 122 39% 55%;
+    --primary-foreground: 0 0% 10%;
+    --primary-light: 122 39% 30%;
+    --primary-dark: 122 39% 70%;
+
+    --secondary: 122 15% 15%;
+    --secondary-foreground: 122 39% 85%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 122 50% 50%;
+    --accent-foreground: 0 0% 10%;
+
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 122 39% 55%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(122, 39%, 55%), hsl(122, 50%, 60%));
+    --gradient-hero: linear-gradient(180deg, hsl(0, 0%, 10%), hsl(0, 0%, 8%));
+    --shadow-eco: 0 10px 30px -10px hsl(122, 39%, 55% / 0.3);
+    --shadow-card: 0 4px 20px -4px hsl(0, 0%, 0% / 0.4);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
