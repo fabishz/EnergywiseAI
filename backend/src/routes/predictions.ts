@@ -6,7 +6,38 @@ import { ValidationError } from '../utils/errors.js';
 
 const router = Router();
 
-// Calculate energy prediction
+/**
+ * @swagger
+ * /predictions/calculate:
+ *   post:
+ *     summary: Calculate energy prediction
+ *     description: Calculate monthly energy bill prediction with personalized savings recommendations and potential badge achievements
+ *     tags: [Predictions]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/PredictionInput'
+ *     responses:
+ *       200:
+ *         description: Prediction calculated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/SuccessResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       $ref: '#/components/schemas/PredictionResult'
+ *       400:
+ *         description: Invalid input data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 router.post('/calculate', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const validatedData = energyPredictionSchema.parse(req.body);
@@ -37,7 +68,47 @@ router.post('/calculate', async (req: Request, res: Response, next: NextFunction
     }
 });
 
-// Get prediction history
+/**
+ * @swagger
+ * /predictions/history:
+ *   get:
+ *     summary: Get prediction history
+ *     description: Retrieve user's prediction history with optional limit
+ *     tags: [Predictions]
+ *     parameters:
+ *       - in: query
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User identifier
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Maximum number of results
+ *     responses:
+ *       200:
+ *         description: Prediction history retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/SuccessResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/PredictionResult'
+ *       400:
+ *         description: Missing userId parameter
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 router.get('/history', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const userId = req.query.userId as string;

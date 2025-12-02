@@ -23,7 +23,7 @@ const EnergyForm = ({ onPredictionResult, onLocationChange }: EnergyFormProps) =
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validation
     if (!formData.usageHours || !formData.applianceCount || !formData.location) {
       toast({
@@ -49,23 +49,32 @@ const EnergyForm = ({ onPredictionResult, onLocationChange }: EnergyFormProps) =
     setLoading(true);
     onLocationChange(formData.location);
 
-    // Simulate API call - replace with actual backend
-    setTimeout(() => {
-      const baseRate = 0.12; // $ per kWh
-      const avgWattage = 100; // average appliance wattage
-      const daysInMonth = 30;
+    try {
+      // Call real backend API
+      const response = await fetch('http://localhost:3001/api/predictions/calculate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          usageHours: hours,
+          applianceCount: count,
+          location: formData.location,
+        }),
+      });
 
-      const monthlyKWh = (hours * count * avgWattage * daysInMonth) / 1000;
-      const predictedBill = monthlyKWh * baseRate;
-      const savingsPercentage = 15 + Math.random() * 10; // 15-25% savings
-      const potentialSavings = predictedBill * (savingsPercentage / 100);
-      const optimizedBill = predictedBill - potentialSavings;
+      if (!response.ok) {
+        throw new Error('Failed to calculate prediction');
+      }
+
+      const result = await response.json();
+      const data = result.data;
 
       onPredictionResult({
-        predictedBill: parseFloat(predictedBill.toFixed(2)),
-        potentialSavings: parseFloat(potentialSavings.toFixed(2)),
-        savingsPercentage: parseFloat(savingsPercentage.toFixed(1)),
-        optimizedBill: parseFloat(optimizedBill.toFixed(2)),
+        predictedBill: data.predictedBill,
+        potentialSavings: data.potentialSavings,
+        savingsPercentage: data.savingsPercentage,
+        optimizedBill: data.optimizedBill,
       });
 
       toast({
@@ -73,8 +82,26 @@ const EnergyForm = ({ onPredictionResult, onLocationChange }: EnergyFormProps) =
         description: "Your energy analysis is ready",
       });
 
+      // Show new badge notifications
+      if (data.newBadges && data.newBadges.length > 0) {
+        data.newBadges.forEach((badge: any) => {
+          setTimeout(() => {
+            toast({
+              title: `New Badge Unlocked! ${badge.icon}`,
+              description: badge.name,
+            });
+          }, 500);
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to calculate prediction",
+        variant: "destructive",
+      });
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   return (

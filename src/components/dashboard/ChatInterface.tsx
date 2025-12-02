@@ -45,27 +45,44 @@ const ChatInterface = () => {
     setInputValue("");
     setIsTyping(true);
 
-    // Simulate API call - replace with actual backend
-    setTimeout(() => {
-      const responses = [
-        "Turn off lights when leaving a room - this simple habit can save up to 10% on your electricity bill!",
-        "Use natural light during the day instead of artificial lighting. Open curtains and blinds to reduce energy consumption.",
-        "Unplug devices when not in use. Many appliances consume energy even when turned off (phantom load).",
-        "Use LED bulbs - they use 75% less energy than traditional incandescent bulbs and last 25 times longer.",
-        "Set your thermostat a few degrees lower in winter and higher in summer. Each degree can save about 3% on bills.",
-        "Use power strips for electronics and turn them off when not needed to eliminate standby power consumption.",
-      ];
+    try {
+      // Call real backend API
+      const response = await fetch('http://localhost:3001/api/chat/message', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: inputValue,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get response');
+      }
+
+      const result = await response.json();
+      const data = result.data;
 
       const assistantMessage: Message = {
         id: messages.length + 2,
-        text: responses[Math.floor(Math.random() * responses.length)],
+        text: data.message,
         sender: "assistant",
         timestamp: new Date(),
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+    } catch (error) {
+      const errorMessage: Message = {
+        id: messages.length + 2,
+        text: "Sorry, I'm having trouble connecting. Please try again later.",
+        sender: "assistant",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1000);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -89,16 +106,14 @@ const ChatInterface = () => {
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex gap-3 ${
-                  message.sender === "user" ? "flex-row-reverse" : ""
-                }`}
+                className={`flex gap-3 ${message.sender === "user" ? "flex-row-reverse" : ""
+                  }`}
               >
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    message.sender === "user"
+                  className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.sender === "user"
                       ? "bg-primary text-primary-foreground"
                       : "bg-secondary text-secondary-foreground"
-                  }`}
+                    }`}
                 >
                   {message.sender === "user" ? (
                     <User className="w-4 h-4" />
@@ -107,11 +122,10 @@ const ChatInterface = () => {
                   )}
                 </div>
                 <div
-                  className={`flex-1 rounded-lg p-3 ${
-                    message.sender === "user"
+                  className={`flex-1 rounded-lg p-3 ${message.sender === "user"
                       ? "bg-primary text-primary-foreground ml-12"
                       : "bg-muted mr-12"
-                  }`}
+                    }`}
                 >
                   <p className="text-sm">{message.text}</p>
                 </div>

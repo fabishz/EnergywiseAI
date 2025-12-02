@@ -17,58 +17,84 @@ interface GamificationPanelProps {
 }
 
 const GamificationPanel = ({ savingsPercentage }: GamificationPanelProps) => {
-  const [badges, setBadges] = useState<Badge[]>([
-    {
-      id: "green-starter",
-      name: "Green Starter",
-      description: "First energy analysis",
-      icon: Leaf,
-      earned: false,
-      threshold: 0,
-    },
-    {
-      id: "eco-hero",
-      name: "Eco Hero",
-      description: "Achieved 10%+ savings",
-      icon: Award,
-      threshold: 10,
-      earned: false,
-    },
-    {
-      id: "energy-master",
-      name: "Energy Master",
-      description: "Achieved 20%+ savings",
-      icon: Trophy,
-      threshold: 20,
-      earned: false,
-    },
-    {
-      id: "sustainability-champion",
-      name: "Sustainability Champion",
-      description: "Achieved 25%+ savings",
-      icon: Star,
-      threshold: 25,
-      earned: false,
-    },
-  ]);
-
+  const [badges, setBadges] = useState<Badge[]>([]);
   const [sustainabilityScore, setSustainabilityScore] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load badges from localStorage
-    const savedBadges = localStorage.getItem("energySaverBadges");
-    if (savedBadges) {
-      setBadges(JSON.parse(savedBadges));
-    }
+    // Fetch badges from backend
+    const fetchBadges = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/api/gamification/badges');
+        const result = await response.json();
 
+        if (result.status === 'success') {
+          const backendBadges = result.data.map((badge: any) => ({
+            id: badge.id,
+            name: badge.name,
+            description: badge.description,
+            icon: getIconComponent(badge.icon),
+            earned: false,
+            threshold: badge.requirement,
+          }));
+          setBadges(backendBadges);
+        }
+      } catch (error) {
+        console.error('Failed to fetch badges:', error);
+        // Fallback to default badges
+        setBadges([
+          {
+            id: "green-starter",
+            name: "Green Starter",
+            description: "First energy analysis",
+            icon: Leaf,
+            earned: false,
+            threshold: 0,
+          },
+          {
+            id: "eco-hero",
+            name: "Eco Hero",
+            description: "Achieved 10%+ savings",
+            icon: Award,
+            threshold: 10,
+            earned: false,
+          },
+          {
+            id: "energy-master",
+            name: "Energy Master",
+            description: "Achieved 20%+ savings",
+            icon: Trophy,
+            threshold: 20,
+            earned: false,
+          },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBadges();
+
+    // Load saved score
     const savedScore = localStorage.getItem("sustainabilityScore");
     if (savedScore) {
       setSustainabilityScore(parseInt(savedScore));
     }
   }, []);
 
+  const getIconComponent = (iconName: string) => {
+    const iconMap: Record<string, typeof Award> = {
+      '🌱': Leaf,
+      '⚡': Award,
+      '🏆': Trophy,
+      '👑': Star,
+      '🌍': Leaf,
+    };
+    return iconMap[iconName] || Award;
+  };
+
   useEffect(() => {
-    if (savingsPercentage > 0) {
+    if (savingsPercentage > 0 && badges.length > 0) {
       const updatedBadges = badges.map((badge) => ({
         ...badge,
         earned: badge.earned || savingsPercentage >= badge.threshold,
@@ -82,7 +108,7 @@ const GamificationPanel = ({ savingsPercentage }: GamificationPanelProps) => {
       setSustainabilityScore(newScore);
       localStorage.setItem("sustainabilityScore", newScore.toString());
     }
-  }, [savingsPercentage]);
+  }, [savingsPercentage, badges.length]);
 
   const earnedCount = badges.filter((b) => b.earned).length;
 
@@ -123,19 +149,17 @@ const GamificationPanel = ({ savingsPercentage }: GamificationPanelProps) => {
               return (
                 <div
                   key={badge.id}
-                  className={`p-3 rounded-lg border-2 transition-all ${
-                    badge.earned
+                  className={`p-3 rounded-lg border-2 transition-all ${badge.earned
                       ? "bg-primary-light border-primary shadow-eco"
                       : "bg-muted border-border opacity-50"
-                  }`}
+                    }`}
                 >
                   <div className="flex flex-col items-center text-center">
                     <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${
-                        badge.earned
+                      className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${badge.earned
                           ? "bg-primary text-primary-foreground"
                           : "bg-background text-muted-foreground"
-                      }`}
+                        }`}
                     >
                       <Icon className="w-6 h-6" />
                     </div>
