@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String?  @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  predictions EnergyPrediction[]
+  badges      UserBadge[]
+  chatMessages ChatMessage[]
+}
+
+model EnergyPrediction {
+  id                 String   @id @default(cuid())
+  userId             String?
+  user               User?    @relation(fields: [userId], references: [id])
+  
+  // Input data
+  usageHours         Float
+  applianceCount     Int
+  location           String
+  
+  // Calculated results
+  predictedBill      Float
+  potentialSavings   Float
+  savingsPercentage  Float
+  optimizedBill      Float
+  monthlyKWh         Float
+  
+  // Recommendations
+  recommendations    String?  // JSON string of recommendations
+  
+  createdAt          DateTime @default(now())
+  
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Badge {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String
+  icon        String
+  requirement Float    // Savings percentage required
+  color       String
+  
+  userBadges  UserBadge[]
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  badgeId   String
+  badge     Badge    @relation(fields: [badgeId], references: [id])
+  earnedAt  DateTime @default(now())
+  
+  @@unique([userId, badgeId])
+  @@index([userId])
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  role      String   // "user" or "assistant"
+  content   String
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Location {
+  id              String  @id @default(cuid())
+  name            String  @unique
+  state           String?
+  country         String  @default("USA")
+  latitude        Float?
+  longitude       Float?
+  energyRate      Float   // $ per kWh
+  renewablePercent Float? // Percentage of renewable energy
+}
