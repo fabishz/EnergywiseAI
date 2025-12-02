@@ -1,0 +1,79 @@
+/**
+ * @swagger
+ * /chat/history:
+ *   get:
+ *     summary: Get chat history
+ *     description: Retrieve conversation history for a user
+ *     tags: [Chat]
+ *     parameters:
+ *       - in: query
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User identifier
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 50
+ *         description: Maximum number of messages
+ *     responses:
+ *       200:
+ *         description: Chat history retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/SuccessResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/ChatMessage'
+ *       400:
+ *         description: Missing userId parameter
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+
+/**
+ * @swagger
+ * /chat/clear:
+ *   delete:
+ *     summary: Clear chat history
+ *     description: Delete all chat messages for a user
+ *     tags: [Chat]
+ *     parameters:
+ *       - in: query
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User identifier
+ *     responses:
+ *       200:
+ *         description: Chat history cleared successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/SuccessResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       type: object
+ *                       properties:
+ *                         success:
+ *                           type: boolean
+ *                           example: true
+ *       400:
+ *         description: Missing userId parameter
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */

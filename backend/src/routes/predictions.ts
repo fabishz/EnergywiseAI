@@ -44,7 +44,7 @@ router.post('/calculate', async (req: Request, res: Response, next: NextFunction
         const result = await predictionService.calculatePrediction(validatedData);
 
         // Check for new badge achievements
-        let newBadges = [];
+        let newBadges: any[] = [];
         if (validatedData.userId) {
             newBadges = await gamificationService.checkAndAwardBadges(
                 validatedData.userId,
@@ -129,7 +129,39 @@ router.get('/history', async (req: Request, res: Response, next: NextFunction) =
     }
 });
 
-// Get specific prediction
+/**
+ * @swagger
+ * /predictions/{id}:
+ *   get:
+ *     summary: Get prediction by ID
+ *     description: Retrieve a specific prediction with full details and recommendations
+ *     tags: [Predictions]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Prediction ID
+ *     responses:
+ *       200:
+ *         description: Prediction retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/SuccessResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       $ref: '#/components/schemas/PredictionResult'
+ *       404:
+ *         description: Prediction not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const prediction = await predictionService.getPredictionById(req.params.id);

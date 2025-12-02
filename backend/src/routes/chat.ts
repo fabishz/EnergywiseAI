@@ -5,7 +5,38 @@ import { ValidationError } from '../utils/errors.js';
 
 const router = Router();
 
-// Send message to AI assistant
+/**
+ * @swagger
+ * /chat/message:
+ *   post:
+ *     summary: Send message to AI assistant
+ *     description: Send a message to the AI energy assistant and receive personalized energy-saving advice
+ *     tags: [Chat]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ChatInput'
+ *     responses:
+ *       200:
+ *         description: Message sent and response received
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/SuccessResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       $ref: '#/components/schemas/ChatResponse'
+ *       400:
+ *         description: Invalid message data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 router.post('/message', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const validatedData = chatMessageSchema.parse(req.body);
