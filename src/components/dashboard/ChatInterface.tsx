@@ -24,11 +24,14 @@ const ChatInterface = () => {
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+    scrollToBottom();
   }, [messages]);
 
   const handleSend = async () => {
@@ -93,15 +96,15 @@ const ChatInterface = () => {
   };
 
   return (
-    <Card className="border-2 shadow-card h-[600px] flex flex-col">
-      <CardHeader className="border-b">
+    <Card className="border-2 shadow-card h-full max-h-[600px] flex flex-col">
+      <CardHeader className="border-b flex-shrink-0">
         <CardTitle className="flex items-center gap-2">
           <MessageCircle className="w-5 h-5 text-primary" />
           AI Energy Tips
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 p-0 flex flex-col">
-        <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+      <CardContent className="flex-1 p-0 flex flex-col overflow-hidden">
+        <div className="flex-1 overflow-y-auto p-4" ref={scrollRef}>
           <div className="space-y-4">
             {messages.map((message) => (
               <div
@@ -111,8 +114,8 @@ const ChatInterface = () => {
               >
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.sender === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary text-secondary-foreground"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground"
                     }`}
                 >
                   {message.sender === "user" ? (
@@ -122,12 +125,12 @@ const ChatInterface = () => {
                   )}
                 </div>
                 <div
-                  className={`flex-1 rounded-lg p-3 ${message.sender === "user"
-                      ? "bg-primary text-primary-foreground ml-12"
-                      : "bg-muted mr-12"
+                  className={`flex-1 max-w-[75%] rounded-lg p-3 break-words ${message.sender === "user"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted"
                     }`}
                 >
-                  <p className="text-sm">{message.text}</p>
+                  <p className="text-sm whitespace-pre-wrap">{message.text}</p>
                 </div>
               </div>
             ))}
@@ -136,7 +139,7 @@ const ChatInterface = () => {
                 <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-secondary">
                   <Bot className="w-4 h-4" />
                 </div>
-                <div className="bg-muted rounded-lg p-3 mr-12">
+                <div className="bg-muted rounded-lg p-3 max-w-[75%]">
                   <div className="flex gap-1">
                     <div className="w-2 h-2 bg-muted-foreground rounded-full animate-pulse-eco" />
                     <div
@@ -151,10 +154,11 @@ const ChatInterface = () => {
                 </div>
               </div>
             )}
+            <div ref={messagesEndRef} />
           </div>
-        </ScrollArea>
+        </div>
 
-        <div className="p-4 border-t">
+        <div className="p-4 border-t flex-shrink-0">
           <div className="flex gap-2">
             <Input
               placeholder="Ask for energy-saving tips..."

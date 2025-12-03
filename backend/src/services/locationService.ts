@@ -10,14 +10,12 @@ export class LocationService {
                 OR: [
                     {
                         name: {
-                            contains: query,
-                            mode: 'insensitive',
+                            contains: query
                         },
                     },
                     {
                         state: {
-                            contains: query,
-                            mode: 'insensitive',
+                            contains: query
                         },
                     },
                 ],
@@ -44,8 +42,7 @@ export class LocationService {
         const location = await prisma.location.findFirst({
             where: {
                 name: {
-                    equals: name,
-                    mode: 'insensitive',
+                    equals: name
                 },
             },
         });

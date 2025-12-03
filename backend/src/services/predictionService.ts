@@ -21,8 +21,7 @@ export class PredictionService {
         const locationData = await prisma.location.findFirst({
             where: {
                 name: {
-                    contains: location,
-                    mode: 'insensitive'
+                    contains: location
                 }
             }
         });
